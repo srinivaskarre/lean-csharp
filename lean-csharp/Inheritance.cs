@@ -4,25 +4,14 @@ namespace inheritance
 {
     class Inheritance
     {
-        static void Main(string[] args)
+        public static void InheritanceMain(string[] args)
         {
-            /*for(int i=0; i<=10; i++) {
-                 Console.WriteLine("Enter two number seperated by ,");
-                 string line = Console.ReadLine();
-                 string[] arr = line.Split(",");
-                 int firstNumber = Convert.ToInt32(arr[0]);
-                 int secondNumber = Convert.ToInt32(arr[1]);
-
-                 Console.WriteLine(firstNumber + secondNumber);
-             }*/
-            PaymentGateway paymentGateway = PaymentGatewayFactory.GetPaymentGatewayFactory().GetPaymentGateway(GatewayType.Paypal);
-            paymentGateway.doPayment(12345, 100.98);
+            PaymentGateway paymentGateway = PaymentGatewayFactory.GetPaymentGatewayFactory().GetPaymentGateway(GatewayType.HDFC);
+            paymentGateway.doPaymentWithAudit(12345, 100.98);
             Console.WriteLine("Completed the payment");
 
             int[] someNums = { 1, 2, 3, 4, 5 };
             Console.WriteLine(someNums.ToString());
-
-
         }
 
 
@@ -65,6 +54,7 @@ namespace inheritance
 
     class HDFCPaymentGateway : PaymentGateway
     {
+        public HDFCPaymentGateway() : base(typeof(HDFCPaymentGateway)) { }
         override public PaymentStatus doPayment(int accountNumber, double amount)
         {
             Console.WriteLine("HDFC bank " + accountNumber + " from this account, deducting " + amount);
@@ -75,6 +65,11 @@ namespace inheritance
     class PaypalPaymentGateway : PaymentGateway
     {
 
+        public PaypalPaymentGateway() : base(typeof(PaypalPaymentGateway))
+        {
+
+        }
+
         override public PaymentStatus doPayment(int accountNumber, double amount)
         {
             Console.WriteLine("Paypal bank " + accountNumber + " from this account, deducting " + amount);
@@ -84,9 +79,19 @@ namespace inheritance
 
     abstract class PaymentGateway
     {
-        PaymentStatus doPaymentWithAudit(int accountNumber, double amount)
+
+        public PaymentGateway(Type type)
         {
-            return doPayment(accountNumber, amount);
+            this.type = type;
+        }
+
+        private Type type;
+        public PaymentStatus doPaymentWithAudit(int accountNumber, double amount)
+        {
+            Console.WriteLine("making payment gateway call of "+type.Name+ "Entry >>");
+            PaymentStatus paymentStatus = doPayment(accountNumber, amount);
+            Console.WriteLine("making payment gateway call of " + type.Name + "Exit <<");
+            return paymentStatus;
         }
         public abstract PaymentStatus doPayment(int accountNumber, double amount);
     }
